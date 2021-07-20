@@ -1,0 +1,194 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\partightenfactor0
+
+\f0\b\fs34 \cf0 \
+\pard\pardeftab560\qc\partightenfactor0
+
+\fs24 \cf0 Crear un proyecto desde cero todo los pasos  juntos
+\fs34 \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+
+\f1\b0\fs24 \cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 1- tengo que ir a una consola y ubicarme en la carpeta donde quiero crear un proyecto\
+\
+2- activo el entorno virtual, en este caso uso conda mini , as\'ed que utilizo el comando 
+\f0\b source activate django2
+\f1\b0  (django2 es el nombre que le puse al entorno virtual)\
+\
+3-ahora si creo un proyecto usando el comando 
+\f0\b python manage.py startproject y el nombre que le quiero poner\
+
+\f1\b0 \
+4-abro la carpeta en el visual Code y con el bot\'f3n derecho abro en terminal el manage.py\
+\
+5- creo la aplicaci\'f3n usando el comando 
+\f0\b manage.py startapp
+\f1\b0  y el nombre que quiero ponerle en este caso \'93core\'94\
+\
+6-creo las vistas en el archivo views de core. agregando httpresponse despu\'e9s de rendir en el sector de import.\
+Creo las vistas de la siguiente manera:  \
+# Create your views here.\
+def home (request):\
+    return HttpResponse("Inicio")\
+def about (request):\
+    return HttpResponse("Historia")\
+def services (request):\
+    return HttpResponse("Servicios")\
+\
+7-Cambiamos esta forma de tener las url y las organizamos de otra manera (video organizando las url)\
+Creo un archivo urls.py adentro de mi app core y copio todos los path y los llevo ah\'ed. Importo desde la ra\'edz\
+from . import views\
+\
+urlpatterns = [\
+    path('',views.home, name="home"),\
+    path('about/', views.about, name="about"),\
+    path('services/', views.services, name="services"),\
+    path('store/',views.store, name="store"),\
+    path('contact/', views.contact, name="contact"),\
+    path('blog/', views.blog, name="blog"),\
+    path('sample/', views.sample, name="sample"),\
+]\
+\
+Y en el archivo urls.py del proyecto webempresa queda de esta manera, col\'f3cando include en el import y agregando solo\
+La ruta a mis url en core.\
+urlpatterns = [\
+    #path del core\
+    path('', include('core.urls')),\
+\
+    #path del admin\
+    path('admin/', admin.site.urls),\
+]\
+\
+
+\f0\b ASI ES COMO LO HICE PRIMERO \
+importo las views de core y creo las url patean en el archivo url de la aplicaci\'f3n core de esta manera.\
+\
+from core import views\
+\
+urlpatterns = [\
+    #path del core\
+    path('',views.home, name="home"),\
+    path('about/', views.about, name="about"),\
+    path('services/', views.services, name="services"),\
+    path('store/',views.store, name="store"),\
+    path('contact/', views.contact, name="contact"),\
+    path('blog/', views.blog, name="blog"),\
+    path('sample/', views.sample, name="sample"),\
+    #path del admin\
+    path('admin/', admin.site.urls),\
+]\
+
+\f1\b0 \
+8- copio los archivos est\'e1ticos del frontend y los pego en la carpeta de static /core de mi backend\
+Lo mismo tengo que hacer con las paginas html , las copio del frontend y las pego en mi carpeta templates/core \
+\
+9- le decimos a django que carga nuestras paginas poniendo en Setting.py  aplicaci\'f3n definition nuestra app llamada core\
+\
+10- borramos el http request y dejamos el render esto en nuestras views de core. Y hacemos un render de cada pagina quedando as\'ed:\
+from django.shortcuts import render\
+\
+# Create your views here.\
+def home (request):\
+    return render(request, "core/Inicio.html")\
+def about (request):\
+    return render(request, "core/Historia.html")\
+def services (request):\
+    return render(request, "core/Servicios.html")\
+def store (request):\
+    return render(request, "core/Visitanos.html")\
+def contact (request):\
+    return render(request, "core/Contacto.html")\
+def blog (request):\
+    return render(request, "core/Blog.html")\
+def sample (request):\
+    return render(request, "core/Sample.html")\
+\
+11-tenemos que cargar los ficheros est\'e1ticos asi que ponemos un Block tag llamado load static y modificamos las direcciones de los archivos est\'e1ticos.\
+
+\f0\b \{% load static %\}
+\f1\b0 \
+    <!-- Bootstrap -->\
+    <link href="
+\f0\b \{% static 'core/
+\f1\b0 vendor/bootstrap/css/bootstrap.min.css
+\f0\b ' %\}
+\f1\b0 " rel="stylesheet">\
+\
+12-copiamos el home y lo pegamos en el misma carpeta core , le cambiamos el nombre a base.html y es este archivo el que vamos a modificar para que sea la base de todos. Elimino las partes que se repiten q son heredadas de base.html en todas las paginas.\
+\
+13-para que se ilumine el men\'fa que seleccionamos usamos la variable request path. Donde esta el active en el link lo rodeo con un tag if de esta manera. Entonces cuando seleccione alg\'fan men\'fa este va a quedar iluminado.\
+\{% if request.path == '/' %\}
+\f0\b active
+\f1\b0 \{% endif %\}\
+\
+14-creamos una carpeta llamada media en la ra\'edz. Entramos al archivo Setting.py y agregamos un path de la siguiente manera:\
+#media config\
+MEDIA_URL = '/media'\
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')\
+\
+15- vamos a urls.py y importamos los settings que creamos reci\'e9n. \
+from django.conf import settings\
+\
+Y agregamos un path \
+if settings.DEBUG:\
+    from django.conf.urls.static import static\
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\
+\
+16-creamos un app llamada services\
+La registramos en setting debajo de core\
+\
+17- creo un modelo en la app service (tabla )\
+\
+class Service(models.Model):\
+    title = models.CharField(max_length=200, verbose_name="Titulo")\
+    subtitle = models.CharField(max_length=200, verbose_name="Subtitulo")\
+    content = models.TextField(verbose_name="Contenido")\
+    image = models.ImageField(verbose_name="Imagen", upload_to="services")\
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creacion")\
+    updated = models.DateTimeField(auto_now=True, verbose_name="Fecha de edicion")\
+\
+    class Meta:\
+        verbose_name = "servicio"\
+        verbose_name_plural = "servicios"\
+        ordering = ['-created']\
+\
+    def __str__(self):\
+        return self.title\
+18- hago un makemigrations y despu\'e9s un m\'edgate\
+19-ahora tenemos que hacer q esta app (services) sea accesible desde el panel de administrador as\'ed que vamos al fichero admin.py e importamos el modelo service\
+Y registramos el modelo service\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 from .models import Service\
+\
+# Register your models here.\
+class ServiceAdmin(admin.ModelAdmin):\
+    readonly_fields = ('created', 'updated')\
+\
+admin.site.register(Service, ServiceAdmin)\
+\
+20-hago un runserver y veo que todo ande bien, ahora vamos a traducir al espa\'f1ol\
+Entramos a settings.py y ponemos leguanje code en = es\
+Para traducir la app entro a apps.py y agrego un verbose name\
+class ServicesConfig(AppConfig):\
+    name = 'services'\
+    verbose_name = 'Gestor de servicios'\
+Ahora volvemos a settings y le decimos que utilice esta configuraci\'f3n extendida\
+INSTALLED_APPS = [\
+    'django.contrib.admin',\
+    'django.contrib.auth',\
+    'django.contrib.contenttypes',\
+    'django.contrib.sessions',\
+    'django.contrib.messages',\
+    'django.contrib.staticfiles',\
+    'core',\
+    'services.apps.ServicesConfig'\
+Todo esto en video 37\
+}
